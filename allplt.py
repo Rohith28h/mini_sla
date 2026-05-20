@@ -2,63 +2,112 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df=pd.read_csv('minmini.csv')
+# Load dataset
+df = pd.read_csv('minmini.csv')
+
+# --------------------------
+# Calculations
+# --------------------------
+product_sales = df.groupby("Product")["Sales"].sum()
+product_profit = df.groupby("Product")["Profit"].sum()
+region_sales = df.groupby("Region")["Sales"].sum()
 
 # Create dashboard size
-plt.figure(figsize=(15,10))
+plt.figure(figsize=(16, 10))
 
-# --------------------------
+# ==========================
 # 1. Product Sales Chart
-# --------------------------
-plt.subplot(2,2,1)
+# ==========================
+plt.subplot(2, 2, 1)
 
-product_sales = df.groupby("Product")["Sales"].sum()
+top_product = product_sales.idxmax()
 
-plt.bar(product_sales.index,
-        product_sales.values)
+colors = ['skyblue' if product != top_product else 'orange'
+          for product in product_sales.index]
 
-plt.title("Product Sales")
+bars = plt.bar(product_sales.index,
+               product_sales.values,
+               color=colors)
+
+plt.title("Product Sales Comparison", fontsize=12)
 plt.xlabel("Products")
-plt.ylabel("Sales")
+plt.ylabel("Total Sales")
+plt.xticks(rotation=20)
 
-# --------------------------
+# Value labels
+for bar in bars:
+    plt.text(bar.get_x() + bar.get_width()/2,
+             bar.get_height(),
+             f'{bar.get_height():.0f}',
+             ha='center',
+             fontsize=8)
+
+# ==========================
 # 2. Product Profit Chart
-# --------------------------
-plt.subplot(2,2,2)
+# ==========================
+plt.subplot(2, 2, 2)
 
-product_profit = df.groupby("Product")["Profit"].sum()
+top_product = product_profit.idxmax()
 
-plt.bar(product_profit.index,
-        product_profit.values)
+colors = ['lightblue' if product != top_product else 'green'
+          for product in product_profit.index]
 
-plt.title("Product Profit")
+bars = plt.bar(product_profit.index,
+               product_profit.values,
+               color=colors)
+
+plt.title("Product Profit Comparison", fontsize=12)
 plt.xlabel("Products")
-plt.ylabel("Profit")
+plt.ylabel("Total Profit")
+plt.xticks(rotation=20)
 
-# --------------------------
+# Value labels
+for bar in bars:
+    plt.text(bar.get_x() + bar.get_width()/2,
+             bar.get_height(),
+             f'{bar.get_height():.0f}',
+             ha='center',
+             fontsize=8)
+
+# ==========================
 # 3. Sales Trend
-# --------------------------
-plt.subplot(2,2,3)
+# ==========================
+plt.subplot(2, 2, 3)
 
 plt.plot(df["Order_ID"],
-         df["Sales"])
+         df["Sales"],
+         marker='o',
+         linewidth=1)
 
-plt.title("Sales Trend")
+plt.title("Sales Trend", fontsize=12)
 plt.xlabel("Order ID")
 plt.ylabel("Sales")
 
-# --------------------------
+plt.grid(True,
+         linestyle="--",
+         alpha=0.7)
+
+# ==========================
 # 4. Profit Distribution
-# --------------------------
-plt.subplot(2,2,4)
+# ==========================
+plt.subplot(2, 2, 4)
 
-plt.pie(product_profit.values,
-        labels=product_profit.index,
-        autopct="%1.1f%%")
+profit_distribution = df.groupby("Product")["Profit"].sum()
 
-plt.title("Profit Distribution")
+explode = [0.1 if value == profit_distribution.max()
+           else 0
+           for value in profit_distribution.values]
 
-# Adjust spacing
+plt.pie(profit_distribution.values,
+        labels=profit_distribution.index,
+        autopct='%1.1f%%',
+        explode=explode)
+
+
+
+plt.title("Profit Distribution", fontsize=12)
+
+# Adjust layout
 plt.tight_layout()
 
 # Show dashboard

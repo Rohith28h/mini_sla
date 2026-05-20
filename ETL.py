@@ -7,7 +7,7 @@ df=pd.read_csv('minmini.csv')
 
 # print(df.head())
 # print("Shape of Dataset:", df.shape)
-# print("Columns:", df.columns)
+print("Columns:", df.columns)
 # print(df.dtypes)
 # print(df.info())
 # Data Quality Check
